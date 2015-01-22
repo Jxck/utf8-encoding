@@ -1,4 +1,7 @@
 /// <reference path="types/webidl.d.ts" />
+/// <reference path="types/obtain-unicode.d.ts" />
+import ObtainUnicode = require("obtain-unicode");
+
 type BufferSource = Uint8Array;
 
 // https://encoding.spec.whatwg.org/#byte
@@ -14,6 +17,50 @@ var EOS:Token = null;
 // https://encoding.spec.whatwg.org/#concept-stream
 type Stream = Token[];
 
+// https://encoding.spec.whatwg.org/#error-mode
+type ErrorMode = string; // TODO: more detail
+
+// https://encoding.spec.whatwg.org/#concept-encoding-process
+function processing(token: Token, encoderDecoderInstance: Instance, input: Stream, output: Stream, mode?: ErrorMode): any {
+  // step 1
+  if (mode === undefined) {
+    if (encoderDecoderInstance instanceof TextDecoder) {
+      mode = "replacement";
+    } else {
+      mode = "fatal";
+    }
+  }
+
+  // step 2
+  var result = encoderDecoderInstance.handler(input, token);
+
+  // step 3
+  if(result === "continue" || result === "finished") {
+    return result;
+  }
+
+  // step 4
+  else if(Array.isArray(result)) { // one or more tokens
+    result.forEach((token: Token) => {
+      output.push(token);
+    });
+  }
+
+  // step 5
+  else if(result) { // TODO: check result is Error
+    switch(mode) {
+    case "replacement":
+      output.push(0xFFFD);
+    case "HTML":
+    case "fatal":
+      return result;
+    }
+  }
+
+  // step 6
+  return "continue";
+}
+
 
 class TextDecoderOptions {
   fatal:     boolean; // default false;
@@ -24,9 +71,13 @@ class TextDecodeOptions {
   stream:    boolean; // default false;
 };
 
+interface Instance {
+handler(input: Stream, token: Token): any; //TODO
+}
+
 // [Constructor(optional DOMString label = "utf-8", optional TextDecoderOptions options),
 //  Exposed=Window,Worker]
-interface ITextDecoder {
+interface ITextDecoder extends Instance {
   encoding:  DOMString;
   fatal:     boolean;
   ignoreBOM: boolean;
@@ -35,7 +86,7 @@ interface ITextDecoder {
 
 // [Constructor(optional DOMString utfLabel = "utf-8"),
 //  Exposed=Window,Worker]
-interface ITextEncoder {
+interface ITextEncoder extends Instance {
   encoding:  DOMString; // readonly
   encode(input?: USVString /*=""*/): Uint8Array; // [NewObject]
 };
@@ -59,7 +110,7 @@ class TextEncoder implements ITextEncoder {
     var encoding = utfLabel.toLowerCase();
 
     // step 2 (support only utf-8)
-    if (utfLabel !== "utf-8" || utfLabel !== "utf8") {
+    if (utfLabel !== "utf-8" && utfLabel !== "utf8") {
       throw new RangeError("unsupported encoding, utf-8 only");
     }
 
@@ -76,22 +127,38 @@ class TextEncoder implements ITextEncoder {
   }
 
   // https://encoding.spec.whatwg.org/#dom-textencoder-encode
-  encode(input: USVString = ""): Uint8Array {
+  encode(inputString: USVString = ""): Uint8Array {
     // step 1
-    // nop
+    var input: Stream = ObtainUnicode(inputString);
 
     // step 2
     var output: Stream = [];
 
     // step 3
-    for (var i=0; ; i++) {
-      // http://www.hcn.zaq.ne.jp/___/WEB/Encoding-ja.html#concept-encoding-process
-      var token: Token = charCodeAt(i);
+    while(true) {
+      // step 3-1
+      var token: Token = input.unshift();
 
+      // step 3-2
+      var result = processing(token, this, input, output);
+      console.log(result);
+
+      break;
     }
+
     return null;
+  }
+
+  handler(input: Stream, token: Token) {
   }
 }
 
 function utf8encoder() {
 }
+
+// TODO
+class TextDecoder {
+}
+
+var encoder = new TextEncoder();
+encoder.encode("abc");
