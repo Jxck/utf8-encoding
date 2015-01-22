@@ -21,10 +21,10 @@ type Stream = Token[];
 type ErrorMode = string; // TODO: more detail
 
 // https://encoding.spec.whatwg.org/#concept-encoding-process
-function processing(token: Token, encoderDecoderInstance: Instance, input: Stream, output: Stream, mode?: ErrorMode): any {
+function processing(token: Token, encoderDecoderInstance: Coder, input: Stream, output: Stream, mode?: ErrorMode): any {
   // step 1
   if (mode === undefined) {
-    if (encoderDecoderInstance instanceof TextDecoder) {
+    if (encoderDecoderInstance instanceof Utf8Encoder) {
       mode = "replacement";
     } else {
       mode = "fatal";
@@ -71,13 +71,9 @@ class TextDecodeOptions {
   stream:    boolean; // default false;
 };
 
-interface Instance {
-handler(input: Stream, token: Token): any; //TODO
-}
-
 // [Constructor(optional DOMString label = "utf-8", optional TextDecoderOptions options),
 //  Exposed=Window,Worker]
-interface ITextDecoder extends Instance {
+interface ITextDecoder {
   encoding:  DOMString;
   fatal:     boolean;
   ignoreBOM: boolean;
@@ -86,7 +82,7 @@ interface ITextDecoder extends Instance {
 
 // [Constructor(optional DOMString utfLabel = "utf-8"),
 //  Exposed=Window,Worker]
-interface ITextEncoder extends Instance {
+interface ITextEncoder {
   encoding:  DOMString; // readonly
   encode(input?: USVString /*=""*/): Uint8Array; // [NewObject]
 };
@@ -97,7 +93,7 @@ interface ITextEncoder extends Instance {
 // https://encoding.spec.whatwg.org/#textencoder
 class TextEncoder implements ITextEncoder {
   private _encoding: DOMString; // only keep encoding name
-  private encoder: any;
+  private encoder: Encoder;
 
   // https://encoding.spec.whatwg.org/#dom-textencoder-encoding
   get encoding(): DOMString {
@@ -120,8 +116,8 @@ class TextEncoder implements ITextEncoder {
     // step 4
     enc._encoding = encoding;
 
-    // step 5
-    enc.encoder = utf8encoder;
+    // step 5 (support only utf-8)
+    enc.encoder = new Utf8Encoder();
 
     return enc;
   }
@@ -140,7 +136,7 @@ class TextEncoder implements ITextEncoder {
       var token: Token = input.unshift();
 
       // step 3-2
-      var result = processing(token, this, input, output);
+      var result = processing(token, this.encoder, input, output);
       console.log(result);
 
       break;
@@ -148,17 +144,24 @@ class TextEncoder implements ITextEncoder {
 
     return null;
   }
+}
 
+interface Coder{
+  handler(input: Stream, token: Token): any; //TODO
+}
+
+interface Encoder extends Coder {
+}
+
+interface Decoder extends Coder {
+}
+
+class Utf8Encoder implements Encoder {
   handler(input: Stream, token: Token) {
   }
 }
 
-function utf8encoder() {
-}
-
-// TODO
-class TextDecoder {
-}
-
-var encoder = new TextEncoder();
-encoder.encode("abc");
+(function() {
+  var encoder = new TextEncoder();
+  encoder.encode("abc");
+})();
