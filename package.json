@@ -1,0 +1,26 @@
+{
+  "name": "utf8-encoding",
+  "version": "0.0.0",
+  "description": "utf8 encoder/decoder of whatwg Encoding Living Standard https://encoding.spec.whatwg.org/",
+  "main": "utf8-encoding.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Jxck/text-encoding"
+  },
+  "keywords": [
+    "whatwg",
+    "w3c",
+    "encoding",
+    "encode",
+    "utf-8"
+  ],
+  "author": "Jxck",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Jxck/text-encoding/issues"
+  },
+  "homepage": "https://github.com/Jxck/text-encoding"
+}
