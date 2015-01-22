@@ -5,7 +5,8 @@
   "main": "utf8-encoding.js",
   "scripts": {
     "tsc": "tsc utf8-encoding.ts --target ES5 --module commonjs --noImplicitAny",
-    "test": "npm run tsc && node utf8-encoding.js"
+    "test": "npm run tsc && node utf8-encoding.js && \\rm -f npm-debug.log",
+    "clean": "\\rm -f *.js"
   },
   "repository": {
     "type": "git",
