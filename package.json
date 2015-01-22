@@ -4,7 +4,7 @@
   "description": "utf8 encoder/decoder of whatwg Encoding Living Standard https://encoding.spec.whatwg.org/",
   "main": "utf8-encoding.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "tsc utf8-encoding.ts --target ES5 --module commonjs --noImplicitAny"
   },
   "repository": {
     "type": "git",
