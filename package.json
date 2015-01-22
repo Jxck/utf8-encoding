@@ -22,5 +22,8 @@
   "bugs": {
     "url": "https://github.com/Jxck/text-encoding/issues"
   },
-  "homepage": "https://github.com/Jxck/text-encoding"
+  "homepage": "https://github.com/Jxck/text-encoding",
+  "dependencies": {
+    "obtain-unicode": "0.0.0"
+  }
 }
