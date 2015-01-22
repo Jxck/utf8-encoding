@@ -12,7 +12,7 @@ type CodePoint = number;
 type Token = Byte | CodePoint;
 
 // https://encoding.spec.whatwg.org/#end-of-stream
-var EOS:Token = null;
+var EOS:Token = undefined;
 
 // https://encoding.spec.whatwg.org/#concept-stream
 type Stream = Token[];
@@ -133,7 +133,7 @@ class TextEncoder implements ITextEncoder {
     // step 3
     while(true) {
       // step 3-1
-      var token: Token = input.unshift();
+      var token: Token = input.shift(); // if undefined, means EOS
 
       // step 3-2
       var result = processing(token, this.encoder, input, output);
@@ -156,8 +156,49 @@ interface Encoder extends Coder {
 interface Decoder extends Coder {
 }
 
+// https://encoding.spec.whatwg.org/#utf-8-encoder
 class Utf8Encoder implements Encoder {
-  handler(input: Stream, token: Token) {
+  handler(input: Stream, codePoint: CodePoint): any {
+    // step 1
+    if(codePoint === EOS) {
+      return 'finished';
+    }
+
+    // step 2
+    if(0 <= codePoint || codePoint <= 0x007F) {
+      return codePoint; // as byte
+    }
+
+    // step 3
+    var count: number, offset: number;
+    if(0x0080 <= codePoint && codePoint <= 0x07FF) {
+      count = 1;
+      offset = 0xC0;
+    }
+    else if(0x0800 <= codePoint && codePoint <= 0xFFFF) {
+      count = 2;
+      offset = 0xE0;
+    }
+    else if(0x10000 <= codePoint && codePoint <= 0x10FFFF) {
+      count = 3;
+      offset = 0xF0;
+    }
+
+    // step 4
+    var bytes = [(codePoint >> (6*count)) + offset];
+
+    // step 5
+    while(count > 0) {
+      // step 5-1
+      var temp = codePoint >> (6*(count-1));
+      // step 5-2
+      bytes.push(0x80 | (temp & 0x3F));
+      // step 5-3
+      count = count - 1;
+    }
+
+    // step 6
+    return bytes;
   }
 }
 
