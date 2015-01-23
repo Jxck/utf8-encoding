@@ -20,68 +20,10 @@ type Stream = Token[];
 // https://encoding.spec.whatwg.org/#error-mode
 type ErrorMode = string; // TODO: more detail
 
-// https://encoding.spec.whatwg.org/#concept-encoding-process
-function processing(token: Token, encoderDecoderInstance: Coder, input: Stream, output: Stream, mode?: ErrorMode): any {
-  // step 1
-  if (mode === undefined) {
-    if (encoderDecoderInstance instanceof Utf8Encoder) {
-      mode = "replacement";
-    } else {
-      mode = "fatal";
-    }
-  }
 
-  // step 2
-  var result = encoderDecoderInstance.handler(input, token);
-
-  // step 3
-  if(result === "continue" || result === "finished") {
-    return result;
-  }
-
-  // step 4
-  else if(Array.isArray(result)) { // one or more tokens
-    result.forEach((token: Token) => {
-      output.push(token);
-    });
-  }
-
-  // step 5
-  else if(result) { // TODO: check result is Error
-    switch(mode) {
-    case "replacement":
-      output.push(0xFFFD);
-      break;
-    case "HTML":
-      throw new Error("unsupported because utf-8 only");
-    case "fatal":
-      return result;
-    }
-  }
-
-  // step 6
-  return "continue";
-}
-
-
-class TextDecoderOptions {
-  fatal:     boolean; // default false;
-  ignoreBOM: boolean; // default false;
-};
-
-class TextDecodeOptions {
-  stream:    boolean; // default false;
-};
-
-// [Constructor(optional DOMString label = "utf-8", optional TextDecoderOptions options),
-//  Exposed=Window,Worker]
-interface ITextDecoder {
-  encoding:  DOMString;
-  fatal:     boolean;
-  ignoreBOM: boolean;
-  decode(input?: BufferSource, options?: TextDecodeOptions): USVString;
-};
-
+/**
+ * TextEncoder
+ */
 // [Constructor(optional DOMString utfLabel = "utf-8"),
 //  Exposed=Window,Worker]
 interface ITextEncoder {
@@ -148,6 +90,74 @@ class TextEncoder implements ITextEncoder {
   }
 }
 
+// https://encoding.spec.whatwg.org/#concept-encoding-process
+function processing(token: Token, encoderDecoderInstance: Coder, input: Stream, output: Stream, mode?: ErrorMode): any {
+  // step 1
+  if (mode === undefined) {
+    if (encoderDecoderInstance instanceof Utf8Encoder) {
+      mode = "replacement";
+    } else {
+      mode = "fatal";
+    }
+  }
+
+  // step 2
+  var result = encoderDecoderInstance.handler(input, token);
+
+  // step 3
+  if(result === "continue" || result === "finished") {
+    return result;
+  }
+
+  // step 4
+  else if(Array.isArray(result)) { // one or more tokens
+    result.forEach((token: Token) => {
+      output.push(token);
+    });
+  }
+
+  // step 5
+  else if(result) { // TODO: check result is Error
+    switch(mode) {
+    case "replacement":
+      output.push(0xFFFD);
+      break;
+    case "HTML":
+      throw new Error("unsupported because utf-8 only");
+    case "fatal":
+      return result;
+    }
+  }
+
+  // step 6
+  return "continue";
+}
+
+/**
+ * TextDecoder
+ */
+class TextDecoderOptions {
+  fatal:     boolean; // default false;
+  ignoreBOM: boolean; // default false;
+};
+
+class TextDecodeOptions {
+  stream:    boolean; // default false;
+};
+
+// [Constructor(optional DOMString label = "utf-8", optional TextDecoderOptions options),
+//  Exposed=Window,Worker]
+interface ITextDecoder {
+  encoding:  DOMString;
+  fatal:     boolean;
+  ignoreBOM: boolean;
+  decode(input?: BufferSource, options?: TextDecodeOptions): USVString;
+};
+
+
+/**
+ * UTF-8 Encoder / Decoder Instance
+ */
 interface Coder{
   handler(input: Stream, token: Token): any; //TODO
 }
