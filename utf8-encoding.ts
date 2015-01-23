@@ -51,7 +51,9 @@ function processing(token: Token, encoderDecoderInstance: Coder, input: Stream, 
     switch(mode) {
     case "replacement":
       output.push(0xFFFD);
+      break;
     case "HTML":
+      throw new Error("unsupported because utf-8 only");
     case "fatal":
       return result;
     }
@@ -137,12 +139,12 @@ class TextEncoder implements ITextEncoder {
 
       // step 3-2
       var result = processing(token, this.encoder, input, output);
-      console.log(result);
 
-      break;
+      // step 3-3
+      if (result === "finished") {
+        return new Uint8Array(output);
+      }
     }
-
-    return null;
   }
 }
 
@@ -204,5 +206,6 @@ class Utf8Encoder implements Encoder {
 
 (function() {
   var encoder = new TextEncoder();
-  encoder.encode("abc");
+  var encoded = encoder.encode("abcde");
+  console.log(encoded);
 })();
