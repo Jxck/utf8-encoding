@@ -1,5 +1,6 @@
 /// <reference path="types/webidl.d.ts" />
 /// <reference path="types/obtain-unicode.d.ts" />
+
 import ObtainUnicode = require("obtain-unicode");
 
 type BufferSource = Uint8Array;
@@ -148,18 +149,49 @@ class TextDecodeOptions {
 // [Constructor(optional DOMString label = "utf-8", optional TextDecoderOptions options),
 //  Exposed=Window,Worker]
 interface ITextDecoder {
-  encoding:  DOMString;
-  fatal:     boolean;
-  ignoreBOM: boolean;
+  encoding:  DOMString; // readonly
+  fatal:     boolean;   // readonly
+  ignoreBOM: boolean;   // readonly
   decode(input?: BufferSource, options?: TextDecodeOptions): USVString;
 };
+
+class TextDecoder implements ITextDecoder {
+  private _encoding:    DOMString;
+  private _fatal:       boolean;
+  private _ignoreBOM:   boolean = false;
+  private decoder:      Decoder;
+  private stream:       any;
+  private ignoreBOMFlag = false;
+  private bomSeenflag   = false;
+  private errorMode     = "replacement";
+  private streamingFlag = false;
+
+  get encoding(): DOMString {
+    return this._encoding;
+  }
+
+  get fatal(): boolean {
+    return this._fatal;
+  }
+
+  get ignoreBOM(): boolean {
+    return this._ignoreBOM;
+  }
+
+  constructor(label: DOMString = "utf-8", options?: TextDecoderOptions) {
+  }
+
+  decode(input?: BufferSource, options?: TextDecodeOptions): USVString {
+    return null;
+  }
+}
 
 
 /**
  * UTF-8 Encoder / Decoder Instance
  */
 interface Coder{
-  handler(input: Stream, token: Token): any; //TODO
+  handler(input: Stream, token: Token): any;
 }
 
 interface Encoder extends Coder {
@@ -214,4 +246,12 @@ class Utf8Encoder implements Encoder {
   }
 }
 
+
+class Utf8Decoder implements Decoder {
+  handler(input: Stream, codePoint: CodePoint): any {
+    return null;
+  }
+}
+
 this.TextEncoder = TextEncoder;
+this.TextDecoder = TextDecoder;
