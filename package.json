@@ -27,5 +27,8 @@
   "homepage": "https://github.com/Jxck/text-encoding",
   "dependencies": {
     "obtain-unicode": "0.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^1.4.1"
   }
 }
