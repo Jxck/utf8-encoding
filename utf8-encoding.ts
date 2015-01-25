@@ -21,11 +21,6 @@ type Stream = Token[];
 // https://encoding.spec.whatwg.org/#error-mode
 type ErrorMode = string; // TODO: more detail
 
-// http://heycam.github.io/webidl/#dfn-get-buffer-source-copy
-function copy(source: BufferSource): BufferSource {
-  return new Uint8Array(source);
-}
-
 /**
  * TextEncoder
  */
@@ -108,7 +103,6 @@ function processing(token: Token, encoderDecoderInstance: Coder, input: Stream, 
 
   // step 2
   var result = encoderDecoderInstance.handler(input, token);
-  console.log(result);
 
   // step 3
   if (result === "continue" || result === "finished") {
@@ -239,10 +233,9 @@ class TextDecoder implements ITextDecoder {
 
     // step 3
     if (input !== undefined) {
-      var copied = copy(input);
-
-      for (var i = 0; i < copied.length; i++) {
-        this.stream.push(copied[i]);
+      // copy
+      for (var i = 0; i < input.length; i++) {
+        this.stream.push(input[i]);
       }
     }
 
@@ -465,8 +458,7 @@ class Utf8Decoder implements Decoder {
 
     // setp 6
     this.utf8BytesSeen += 1;
-    this.utf8CodePoint
-    = this.utf8CodePoint + (byt - 0x80) << (6 * (this.utf8BytesNeeded - this.utf8BytesSeen))
+    this.utf8CodePoint += (byt - 0x80) << (6 * (this.utf8BytesNeeded - this.utf8BytesSeen))
 
     // step 7
     if (this.utf8BytesSeen !== this.utf8BytesNeeded) {
@@ -487,3 +479,5 @@ class Utf8Decoder implements Decoder {
 
 this.TextEncoder = TextEncoder;
 this.TextDecoder = TextDecoder;
+
+console.log(new TextDecoder().decode(new TextEncoder().encode("あ")));
