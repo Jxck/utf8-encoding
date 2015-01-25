@@ -23,9 +23,8 @@ type ErrorMode = string; // TODO: more detail
 
 // http://heycam.github.io/webidl/#dfn-get-buffer-source-copy
 function copy(source: BufferSource): BufferSource {
-  return source.subarray(0);
+  return new Uint8Array(source.subarray(0));
 }
-
 
 /**
  * TextEncoder
@@ -234,12 +233,10 @@ class TextDecoder implements ITextDecoder {
 
     // step 3
     if (input !== undefined) {
-      // TODO: copy !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      // http://heycam.github.io/webidl/#dfn-get-buffer-source-copy
-      var tmp = copy(input);
+      var copied = copy(input);
 
-      for (var i = 0; i < tmp.length; i++) {
-        this.stream.push(tmp[i]);
+      for (var i = 0; i < copied.length; i++) {
+        this.stream.push(copied[i]);
       }
     }
 
@@ -247,9 +244,9 @@ class TextDecoder implements ITextDecoder {
     var output: Stream = [];
 
     // step 5
-    while(true) {
+    while(true) { i? i++: i=0;
       // step 5-1
-      var token: Token = input.shift();
+      var token: Token = input[i];
 
       // step 5-2
       if (token === undefined && this.streamingFlag === true) {
