@@ -375,8 +375,63 @@ class Utf8Encoder implements Encoder {
 }
 
 
+// https://encoding.spec.whatwg.org/#utf-8-decoder
 class Utf8Decoder implements Decoder {
-  handler(input: Stream, codePoint: CodePoint): any {
+  private utf8CodePoint: CodePoint;
+  private utf8BytesSeen: number = 0;
+  private utf8BytesNeeded: number = 0;
+  private utf8LowerBoundary: number = 0x80;
+  private utf8UpperBoundary: number = 0xBF;
+
+  handler(input: Stream, byt: Byte): any {
+    // step 1
+    if (byt === EOS && this.utf8BytesNeeded !== 0) {
+      this.utf8BytesNeeded = 0;
+      return new Error("invalid state");
+    }
+
+    // step 2
+    if (byt === EOS) {
+      return "finished";
+    }
+
+    // step 3
+    if (this.utf8BytesNeeded === 0) {
+      if (0x00 <= byt && byt <= 0x7F) {
+        return String.fromCharCode(byt);
+      }
+      else if (0xC2 <= byt && byt <= 0xDF) {
+        this.utf8BytesNeeded = 1;
+        this.utf8CodePoint = 0xC0;
+      }
+      else if (0xE0 <= byt && byt <= 0xEF) {
+        if (byt === 0xE0) {
+          this.utf8LowerBoundary = 0xA0;
+        }
+        if (byt === 0xED) {
+          this.utf8UpperBoundary = 0x9F;
+        }
+        this.utf8BytesNeeded = 2;
+        this.utf8CodePoint = byt - 0xE0;
+      }
+      else if (0xF0 <= byt && byt <= 0xF4) {
+        if (byt === 0xF0) {
+          this.utf8LowerBoundary = 0x90;
+        }
+        if (byt === 0xF4) {
+          this.utf8UpperBoundary = 0x8F;
+        }
+        this.utf8BytesNeeded = 3;
+        this.utf8CodePoint = byt - 0xF0;
+      }
+      else {
+        return new Error("invalid sequence");
+      }
+
+      this.utf8CodePoint = this.utf8CodePoint << (6*this.utf8BytesNeeded)
+      return "continue";
+    }
+
     return null;
   }
 }
