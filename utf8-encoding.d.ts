@@ -1,18 +1,23 @@
-/// <reference path="types/webidl.d.ts" />
-/// <reference path="types/obtain-unicode.d.ts" />
-
 declare module UTF8Encoding {
-  interface ITextEncoder {
-    encoding:  DOMString; // readonly
-    encode(input?: USVString /*=""*/): Uint8Array; // [NewObject]
-  };
+  interface TextEncoder {
+    encoding: string; // readonly
+    encode(input?: string): Uint8Array;
+  }
+  var TextEncoder: {
+    prototype: TextEncoder;
+    new (utfLabel?: string): TextEncoder;
+  }
 
-  interface ITextDecoder {
-    encoding:  DOMString; // readonly
-    fatal:     boolean;   // readonly
-    ignoreBOM: boolean;   // readonly
-    decode(input?: BufferSource, options?: TextDecodeOptions): USVString;
-  };
+  interface TextDecoder {
+    encoding:  string;
+    fatal:     boolean;
+    ignoreBOM: boolean;
+    decode(input?: any, options?: Object): string;
+  }
+  var TextDecoder: {
+    prototype: TextDecoder;
+    new (label?: string, options?: Object): TextDecoder;
+  }
 }
 
 declare module 'utf8-encoding' {
