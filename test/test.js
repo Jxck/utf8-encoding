@@ -30,12 +30,6 @@ function assert(actual, expected) {
       assert(actual[i], expected[i]);
     }
 
-    // assert(s, decoder.decode(actual));
+    assert(s, decoder.decode(actual));
   });
-});
-
-
-var encoder = new TextEncoder();
-var decoder = new TextDecoder();
-// 21489
-console.log(decoder.decode(encoder.encode("𠮟")));
+})();
