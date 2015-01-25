@@ -23,7 +23,7 @@ type ErrorMode = string; // TODO: more detail
 
 // http://heycam.github.io/webidl/#dfn-get-buffer-source-copy
 function copy(source: BufferSource): BufferSource {
-  return new Uint8Array(source.subarray(0));
+  return new Uint8Array(source);
 }
 
 /**
