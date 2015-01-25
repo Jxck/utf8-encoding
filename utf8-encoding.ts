@@ -292,7 +292,9 @@ class TextDecoder implements ITextDecoder {
       var token: Token = stream.shift();
 
       // step 2-2
-      if (["utf-8", "utf8"].indexOf(this._encoding) != -1 && this.ignoreBOMFlag === false && this.bomSeenFlag === false) {
+      if (["utf-8", "utf8"].indexOf(this._encoding) > -1
+          && this.ignoreBOMFlag === false
+          && this.bomSeenFlag === false) {
         // step 2-2-1
         if (token === 0xFEFF) {
           this.bomSeenFlag = true;
