@@ -37,4 +37,5 @@ function assert(actual, expected) {
 
 var encoder = new TextEncoder();
 var decoder = new TextDecoder();
-console.log(decoder.decode(encoder.encode("あ")));
+// 21489
+console.log(decoder.decode(encoder.encode("𠮟")));
