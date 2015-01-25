@@ -51,7 +51,7 @@ class TextEncoder implements ITextEncoder {
     var encoding = utfLabel.toLowerCase();
 
     // step 2 (support only utf-8)
-    if (utfLabel !== "utf-8" && utfLabel !== "utf8") {
+    if (encoding !== "utf-8" && encoding !== "utf8") {
       throw new RangeError("unsupported encoding, utf-8 only");
     }
 
@@ -178,7 +178,37 @@ class TextDecoder implements ITextDecoder {
     return this._ignoreBOM;
   }
 
+  // https://encoding.spec.whatwg.org/#dom-textdecoder
   constructor(label: DOMString = "utf-8", options?: TextDecoderOptions) {
+    // step 1 (not compat with spec)
+    var encoding = label.toLowerCase();
+
+    // step 2 (support only utf-8)
+    if (encoding !== "utf-8" && encoding !== "utf8") {
+      if (encoding === "replacement") {
+        throw new RangeError("encoding is 'replacement'");
+      }
+      throw new RangeError("unsupported encoding, utf-8 only");
+    }
+
+    // step 3
+    var dec = this;
+
+    // step 4
+    dec.encoding = encoding;
+
+    // step 5
+    if (options.fatal === true) {
+      dec.errorMode = "fatal";
+    }
+
+    // step 6
+    if (options.ignoreBOM === true) {
+      dec._ignoreBOM = true;
+    }
+
+    // step 7
+    return dec;
   }
 
   decode(input?: BufferSource, options?: TextDecodeOptions): USVString {
