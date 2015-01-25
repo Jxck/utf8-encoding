@@ -21,6 +21,11 @@ type Stream = Token[];
 // https://encoding.spec.whatwg.org/#error-mode
 type ErrorMode = string; // TODO: more detail
 
+// http://heycam.github.io/webidl/#dfn-get-buffer-source-copy
+function copy(source: BufferSource): BufferSource {
+  return source.subarray(0);
+}
+
 
 /**
  * TextEncoder
@@ -160,9 +165,9 @@ class TextDecoder implements ITextDecoder {
   private _fatal:       boolean;
   private _ignoreBOM:   boolean = false;
   private decoder:      Decoder;
-  private stream:       any;
+  private stream:       Stream;
   private ignoreBOMFlag = false;
-  private bomSeenflag   = false;
+  private bomSeenFlag   = false;
   private errorMode     = "replacement";
   private streamingFlag = false;
 
@@ -211,11 +216,107 @@ class TextDecoder implements ITextDecoder {
     return dec;
   }
 
+  // https://encoding.spec.whatwg.org/#dom-textdecoder-decode
   decode(input?: BufferSource, options?: TextDecodeOptions): USVString {
-    return null;
+    // step 1
+    if(this.streamingFlag === true) {
+      this.decoder = new Utf8Decoder();
+      this.stream = [];
+      this.bomSeenFlag = false;
+    }
+
+    // step 2
+    if(options.stream === true) {
+      this.streamingFlag = true;
+    } else {
+      this.streamingFlag = false;
+    }
+
+    // step 3
+    if (input !== undefined) {
+      // TODO: copy !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      // http://heycam.github.io/webidl/#dfn-get-buffer-source-copy
+      var tmp = copy(input);
+
+      for (var i = 0; i < tmp.length; i++) {
+        this.stream.push(tmp[i]);
+      }
+    }
+
+    // step 4
+    var output: Stream = [];
+
+    // step 5
+    while(true) {
+      // step 5-1
+      var token: Token = input.shift();
+
+      // step 5-2
+      if (token === undefined && this.streamingFlag === true) {
+        return this.serialize(output);
+      }
+      // step 5-3
+      else {
+        // step 5-3-1
+        var result = processing(token, this.decoder, this.stream, output, this.errorMode);
+
+        // step 5-3-2
+        if (result === "finished") {
+          return this.serialize(output);
+        }
+
+        // step 5-3-3
+        else if (result === "error") {
+          throw new TypeError("invalid input")
+        }
+
+        // step 5-3-4
+        else {
+          // do nothing
+        }
+      }
+    }
+  }
+
+  // https://encoding.spec.whatwg.org/#concept-td-serialize
+  serialize(stream: Stream): string {
+    // step 1
+    var output: string = "";
+
+    // step 2
+    while(true) {
+      // step 2-1
+      var token: Token = stream.shift();
+
+      // step 2-2
+      if (["utf-8", "utf8"].indexOf(this.encoding) > 0 && this._ignoreBOM === false && this.bomSeenFlag === false) {
+        // step 2-2-1
+        if (token === 0xFEFF) {
+          this.bomSeenFlag = true;
+        }
+        // step 2-2-2
+        else if (token !== EOS) {
+          this.bomSeenFlag = true;
+          output += token;
+        }
+        // step 2-2-3
+        else {
+          return output;
+        }
+      }
+
+      // step 2-3
+      else if (token !== EOS) {
+        output += token;
+      }
+
+      // step 2-4
+      else {
+        return output;
+      }
+    }
   }
 }
-
 
 /**
  * UTF-8 Encoder / Decoder Instance
