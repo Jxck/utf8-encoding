@@ -1,4 +1,5 @@
 var TextEncoder = TextEncoder || require('../utf8-encoding').TextEncoder;
+var TextDecoder = TextDecoder || require('../utf8-encoding').TextDecoder;
 
 // tests
 function assert(actual, expected) {
@@ -8,6 +9,7 @@ function assert(actual, expected) {
 
 (function test() {
   var encoder = new TextEncoder();
+  var decoder = new TextDecoder();
   [
     [ "aAzZ09",    [ 97, 65, 122, 90, 48, 57 ]],
     [ "~`!@",      [ 126, 96, 33, 64 ]],
@@ -26,5 +28,15 @@ function assert(actual, expected) {
     for (var i = 0; i < actual.length; i++) {
       assert(actual[i], expected[i]);
     }
+
+    var actual = decoder.decode(s[1]);
+    var expected = e[0];
+    assert(actual, expected);
   });
-})();
+});
+
+
+var encoder = new TextEncoder();
+var decoder = new TextDecoder();
+
+console.log(decoder.decode(encoder.encode("a")));

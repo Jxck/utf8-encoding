@@ -183,7 +183,7 @@ class TextDecoder implements ITextDecoder {
   }
 
   // https://encoding.spec.whatwg.org/#dom-textdecoder
-  constructor(label: DOMString = "utf-8", options?: TextDecoderOptions) {
+  constructor(label: DOMString = "utf-8", options: TextDecoderOptions = { fatal: false, ignoreBOM: false }) {
     // step 1 (not compat with spec)
     var encoding = label.toLowerCase();
 
@@ -216,9 +216,9 @@ class TextDecoder implements ITextDecoder {
   }
 
   // https://encoding.spec.whatwg.org/#dom-textdecoder-decode
-  decode(input?: BufferSource, options?: TextDecodeOptions): USVString {
+  decode(input?: BufferSource, options: TextDecodeOptions = { stream: false }): USVString {
     // step 1
-    if(this.streamingFlag === true) {
+    if(this.streamingFlag !== true) {
       this.decoder = new Utf8Decoder();
       this.stream = [];
       this.bomSeenFlag = false;
@@ -244,9 +244,9 @@ class TextDecoder implements ITextDecoder {
     var output: Stream = [];
 
     // step 5
-    while(true) { i? i++: i=0;
+    for(var j=0;;j++) {
       // step 5-1
-      var token: Token = input[i];
+      var token: Token = input[j];
 
       // step 5-2
       if (token === undefined && this.streamingFlag === true) {
@@ -294,7 +294,7 @@ class TextDecoder implements ITextDecoder {
         // step 2-2-2
         else if (token !== EOS) {
           this.bomSeenFlag = true;
-          output += token;
+          output += String.fromCharCode(token);
         }
         // step 2-2-3
         else {
@@ -304,7 +304,7 @@ class TextDecoder implements ITextDecoder {
 
       // step 2-3
       else if (token !== EOS) {
-        output += token;
+        output += String.fromCharCode(token);
       }
 
       // step 2-4
