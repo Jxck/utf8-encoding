@@ -80,7 +80,7 @@ class TextEncoder implements ITextEncoder {
     var output: Stream = [];
 
     // step 3
-    while(true) {
+    while (true) {
       // step 3-1
       var token: Token = input.shift(); // if undefined, means EOS
 
@@ -108,21 +108,25 @@ function processing(token: Token, encoderDecoderInstance: Coder, input: Stream, 
 
   // step 2
   var result = encoderDecoderInstance.handler(input, token);
+  console.log(result);
 
   // step 3
-  if(result === "continue" || result === "finished") {
+  if (result === "continue" || result === "finished") {
     return result;
   }
 
   // step 4
-  else if(Array.isArray(result)) { // one or more tokens
+  else if (Array.isArray(result)) { // one or more tokens
     result.forEach((token: Token) => {
       output.push(token);
     });
   }
+  else if (typeof result === "number") {
+    output.push(result);
+  }
 
   // step 5
-  else if(result) { // TODO: check result is Error
+  else if (result === "error") {
     switch(mode) {
     case "replacement":
       output.push(0xFFFD);
@@ -161,8 +165,6 @@ interface ITextDecoder {
 
 class TextDecoder implements ITextDecoder {
   private _encoding:    DOMString;
-  private _fatal:       boolean;
-  private _ignoreBOM:   boolean = false;
   private decoder:      Decoder;
   private stream:       Stream;
   private ignoreBOMFlag = false;
@@ -170,16 +172,20 @@ class TextDecoder implements ITextDecoder {
   private errorMode     = "replacement";
   private streamingFlag = false;
 
+  // https://encoding.spec.whatwg.org/#dom-textdecoder-encoding
   get encoding(): DOMString {
+    // this impl has only name
     return this._encoding;
   }
 
+  // https://encoding.spec.whatwg.org/#dom-textdecoder-fatal
   get fatal(): boolean {
-    return this._fatal;
+    return this.errorMode === "fatal";
   }
 
+  // https://encoding.spec.whatwg.org/#dom-textdecoder-ignorebom
   get ignoreBOM(): boolean {
-    return this._ignoreBOM;
+    return this.ignoreBOMFlag;
   }
 
   // https://encoding.spec.whatwg.org/#dom-textdecoder
@@ -199,7 +205,7 @@ class TextDecoder implements ITextDecoder {
     var dec = this;
 
     // step 4
-    dec.encoding = encoding;
+    dec._encoding = encoding;
 
     // step 5
     if (options.fatal === true) {
@@ -208,7 +214,7 @@ class TextDecoder implements ITextDecoder {
 
     // step 6
     if (options.ignoreBOM === true) {
-      dec._ignoreBOM = true;
+      dec.ignoreBOMFlag = true;
     }
 
     // step 7
@@ -218,14 +224,14 @@ class TextDecoder implements ITextDecoder {
   // https://encoding.spec.whatwg.org/#dom-textdecoder-decode
   decode(input?: BufferSource, options: TextDecodeOptions = { stream: false }): USVString {
     // step 1
-    if(this.streamingFlag !== true) {
+    if (this.streamingFlag !== true) {
       this.decoder = new Utf8Decoder();
       this.stream = [];
       this.bomSeenFlag = false;
     }
 
     // step 2
-    if(options.stream === true) {
+    if (options.stream === true) {
       this.streamingFlag = true;
     } else {
       this.streamingFlag = false;
@@ -281,12 +287,12 @@ class TextDecoder implements ITextDecoder {
     var output: string = "";
 
     // step 2
-    while(true) {
+    while (true) {
       // step 2-1
       var token: Token = stream.shift();
 
       // step 2-2
-      if (["utf-8", "utf8"].indexOf(this.encoding) > 0 && this._ignoreBOM === false && this.bomSeenFlag === false) {
+      if (["utf-8", "utf8"].indexOf(this._encoding) != -1 && this.ignoreBOMFlag === false && this.bomSeenFlag === false) {
         // step 2-2-1
         if (token === 0xFEFF) {
           this.bomSeenFlag = true;
@@ -332,26 +338,26 @@ interface Decoder extends Coder {
 class Utf8Encoder implements Encoder {
   handler(input: Stream, codePoint: CodePoint): any {
     // step 1
-    if(codePoint === EOS) {
+    if (codePoint === EOS) {
       return 'finished';
     }
 
     // step 2
-    if(0 <= codePoint && codePoint <= 0x007F) {
-      return [codePoint]; // as byte
+    if (0 <= codePoint && codePoint <= 0x007F) {
+      return codePoint;
     }
 
     // step 3
     var count: number, offset: number;
-    if(0x0080 <= codePoint && codePoint <= 0x07FF) {
+    if (0x0080 <= codePoint && codePoint <= 0x07FF) {
       count = 1;
       offset = 0xC0;
     }
-    else if(0x0800 <= codePoint && codePoint <= 0xFFFF) {
+    else if (0x0800 <= codePoint && codePoint <= 0xFFFF) {
       count = 2;
       offset = 0xE0;
     }
-    else if(0x10000 <= codePoint && codePoint <= 0x10FFFF) {
+    else if (0x10000 <= codePoint && codePoint <= 0x10FFFF) {
       count = 3;
       offset = 0xF0;
     }
@@ -360,7 +366,7 @@ class Utf8Encoder implements Encoder {
     var bytes = [(codePoint >> (6*count)) + offset];
 
     // step 5
-    while(count > 0) {
+    while (count > 0) {
       // step 5-1
       var temp = codePoint >> (6*(count-1));
       // step 5-2
@@ -377,7 +383,7 @@ class Utf8Encoder implements Encoder {
 
 // https://encoding.spec.whatwg.org/#utf-8-decoder
 class Utf8Decoder implements Decoder {
-  private utf8CodePoint: CodePoint;
+  private utf8CodePoint: CodePoint = 0;
   private utf8BytesSeen: number = 0;
   private utf8BytesNeeded: number = 0;
   private utf8LowerBoundary: number = 0x80;
@@ -387,7 +393,7 @@ class Utf8Decoder implements Decoder {
     // step 1
     if (byt === EOS && this.utf8BytesNeeded !== 0) {
       this.utf8BytesNeeded = 0;
-      return new Error("invalid state");
+      return "error";
     }
 
     // step 2
@@ -398,11 +404,11 @@ class Utf8Decoder implements Decoder {
     // step 3
     if (this.utf8BytesNeeded === 0) {
       if (0x00 <= byt && byt <= 0x7F) {
-        return String.fromCharCode(byt);
+        return byt;
       }
       else if (0xC2 <= byt && byt <= 0xDF) {
         this.utf8BytesNeeded = 1;
-        this.utf8CodePoint = 0xC0;
+        this.utf8CodePoint = byt - 0xC0;
       }
       else if (0xE0 <= byt && byt <= 0xEF) {
         if (byt === 0xE0) {
@@ -425,14 +431,55 @@ class Utf8Decoder implements Decoder {
         this.utf8CodePoint = byt - 0xF0;
       }
       else {
-        return new Error("invalid sequence");
+        return "error";
       }
+
+      // TODO: remove this assertion
+      if (!(0xC2 <= byt && byt <= 0xF4)) console.assert(false);
 
       this.utf8CodePoint = this.utf8CodePoint << (6*this.utf8BytesNeeded)
       return "continue";
     }
 
-    return null;
+    // step 4
+    if (byt < this.utf8LowerBoundary || this.utf8UpperBoundary < byt) {
+      // step 4-1
+      this.utf8CodePoint = 0;
+      this.utf8BytesNeeded = 0;
+      this.utf8BytesSeen = 0;
+      this.utf8LowerBoundary = 0x80;
+      this.utf8UpperBoundary = 0xBF;
+
+      // step 4-2
+      input.unshift(byt);
+
+      // step 4-3
+      return "error";
+    }
+
+    // step 5
+    this.utf8LowerBoundary = 0x80;
+    this.utf8UpperBoundary = 0xBF;
+
+    // setp 6
+    this.utf8BytesSeen += 1;
+    this.utf8CodePoint
+    = this.utf8CodePoint + (byt - 0x80) << (6 * (this.utf8BytesNeeded - this.utf8BytesSeen))
+
+    // step 7
+    if (this.utf8BytesSeen !== this.utf8BytesNeeded) {
+      return "continue";
+    }
+
+    // step 8
+    var codePoint = this.utf8CodePoint;
+
+    // step 9
+    this.utf8CodePoint = 0
+    this.utf8BytesNeeded = 0;
+    this.utf8BytesSeen = 0;
+
+    return codePoint;
   }
 }
 
