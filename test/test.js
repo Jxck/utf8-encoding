@@ -7,6 +7,15 @@ function assert(actual, expected) {
   console.assert(actual === expected, '\nact: ' + actual + '\nexp: ' + expected);
 }
 
+(function example() {
+  var encoder = new TextEncoder();
+  var decoder = new TextDecoder();
+  console.log(encoder.encode("beer!🍻"));
+  // Uint8Array[98, 101, 101, 114, 33, 240, 159, 141, 187]
+  console.log(decoder.decode(new Uint8Array([98, 101, 101, 114, 33, 240, 159, 141, 187])));
+  // "beer!🍻
+})();
+
 (function test() {
   var encoder = new TextEncoder();
   var decoder = new TextDecoder();
