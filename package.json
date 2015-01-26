@@ -12,6 +12,16 @@
   "devDependencies": {
     "typescript": "^1.4.1"
   },
+  "files": [
+    "test",
+    "types",
+    ".gitignore",
+    "README.md",
+    "package.json",
+    "utf8-encoding.d.ts",
+    "utf8-encoding.js",
+    "utf8-encoding.ts"
+  ],
   "homepage": "https://github.com/Jxck/text-encoding",
   "keywords": [
     "whatwg",
@@ -28,7 +38,8 @@
   },
   "scripts": {
     "clean": "\\rm -f *.js",
-    "test": "npm run tsc && node test/test.js && \\rm -f npm-debug.log",
+    "prepublish": "npm run tsc",
+    "test": "npm run tsc && node test/test.js && \\rm -f npm-debug.log && echo open test/index.html in your browser",
     "tsc": "tsc utf8-encoding.ts --target ES5 --module commonjs --noImplicitAny"
   }
 }
