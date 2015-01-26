@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "author": "Jxck",
   "bugs": {
-    "url": "https://github.com/Jxck/text-encoding/issues"
+    "url": "https://github.com/Jxck/utf8-encoding/issues"
   },
   "dependencies": {
     "obtain-unicode": "0.0.2"
@@ -22,7 +22,7 @@
     "utf8-encoding.js",
     "utf8-encoding.ts"
   ],
-  "homepage": "https://github.com/Jxck/text-encoding",
+  "homepage": "https://github.com/Jxck/utf8-encoding",
   "keywords": [
     "whatwg",
     "w3c",
@@ -34,7 +34,7 @@
   "main": "utf8-encoding.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Jxck/text-encoding"
+    "url": "https://github.com/Jxck/utf8-encoding"
   },
   "scripts": {
     "clean": "\\rm -f *.js",
