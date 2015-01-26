@@ -7,7 +7,7 @@
     "url": "https://github.com/Jxck/text-encoding/issues"
   },
   "dependencies": {
-    "obtain-unicode": "0.0.1"
+    "obtain-unicode": "0.0.2"
   },
   "devDependencies": {
     "typescript": "^1.4.1"
