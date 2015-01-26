@@ -16,7 +16,16 @@ declare var String: {
 /**
  * Main
  */
-import ObtainUnicode = require("obtain-unicode");
+// for dynamic require
+declare var require: any;
+
+// import only type info
+import ou = require('obtain-unicode');
+
+var ObtainUnicode: typeof ou.ObtainUnicode;
+if (typeof window === 'undefined') { // in node.js
+  ObtainUnicode = require("obtain-unicode").ObtainUnicode;
+}
 
 type BufferSource = Uint8Array;
 
