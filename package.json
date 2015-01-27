@@ -1,7 +1,7 @@
 {
   "name": "utf8-encoding",
   "description": "utf8 encoder/decoder of whatwg Encoding Living Standard https://encoding.spec.whatwg.org/",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "author": "Jxck",
   "bugs": {
     "url": "https://github.com/Jxck/utf8-encoding/issues"
