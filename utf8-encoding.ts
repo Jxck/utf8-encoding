@@ -1,7 +1,7 @@
 /// <reference path="types/webidl.d.ts" />
 /// <reference path="types/obtain-unicode.d.ts" />
 
-// polyfill for String.fromCharCode
+// polyfill for String.fromCodePoint
 declare var String: {
   new (value?: any): String;
   (value?: any): string;
