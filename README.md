@@ -39,12 +39,18 @@ $ npm test
 
 and also open test/index.html in your browser and see console.
 
+
 ## for TypeScript
 
 use [utf8-encoding.d.ts](./utf8-encoding.d.ts)
 
 other types which this scripts depends on are in [types](./types) directory.
 
+
+## branch
+
+build js in release branch and add tag with semver,
+will publish to npm and bower.
 
 ## License
 
