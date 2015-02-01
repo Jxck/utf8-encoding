@@ -25,5 +25,8 @@
   "repository": {
     "type": "git",
     "url": "git://github.com/Jxck/utf8-encoding.git"
+  },
+  "dependencies": {
+    "obtain-unicode": "*"
   }
 }
