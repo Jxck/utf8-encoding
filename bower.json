@@ -5,6 +5,9 @@
   "authors": [
     "Jxck"
   ],
+  "dependencies": {
+    "obtain-unicode": "*"
+  },
   "homepage": "https://github.com/Jxck/utf8-encoding",
   "ignore": [
     "**/.*",
@@ -25,8 +28,5 @@
   "repository": {
     "type": "git",
     "url": "git://github.com/Jxck/utf8-encoding.git"
-  },
-  "dependencies": {
-    "obtain-unicode": "*"
   }
 }
