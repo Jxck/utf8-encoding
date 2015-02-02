@@ -11,7 +11,7 @@ declare var String: {
    * Pollyfill of String.fromCodePoint
    */
   fromCodePoint(...codePoints: number[]): string;
-}
+};
 
 /**
  * Main
@@ -20,14 +20,15 @@ declare var String: {
 declare var require: any;
 
 // import only type info
-import ou = require('obtain-unicode');
+import ou = require("obtain-unicode");
 
 var ObtainUnicode: typeof ou.ObtainUnicode;
-if (typeof window === 'undefined') { // in node.js
+if (typeof window === "undefined") { // in node.js
   ObtainUnicode = require("obtain-unicode").ObtainUnicode;
 }
 
 module UTF8Encoder {
+  "use strict";
 
   type BufferSource = Uint8Array;
 
@@ -39,7 +40,7 @@ module UTF8Encoder {
   type Token = Byte | CodePoint;
 
   // https://encoding.spec.whatwg.org/#end-of-stream
-  var EOS:Token = undefined;
+  var EOS: Token = undefined;
 
   // https://encoding.spec.whatwg.org/#concept-stream
   type Stream = Token[];
@@ -63,7 +64,7 @@ module UTF8Encoder {
   // https://encoding.spec.whatwg.org/#textencoder
   export class TextEncoder implements ITextEncoder {
     private _encoding: DOMString; // only keep encoding name
-    private encoder: Encoder;
+    private encoder: IEncoder;
 
     // https://encoding.spec.whatwg.org/#dom-textencoder-encoding
     get encoding(): DOMString {
@@ -117,7 +118,7 @@ module UTF8Encoder {
   }
 
   // https://encoding.spec.whatwg.org/#concept-encoding-process
-  function processing(token: Token, encoderDecoderInstance: Coder, input: Stream, output: Stream, mode?: ErrorMode): any {
+  function processing(token: Token, encoderDecoderInstance: ICoder, input: Stream, output: Stream, mode?: ErrorMode): any {
     // step 1
     if (mode === undefined) {
       if (encoderDecoderInstance instanceof Utf8Encoder) {
@@ -147,7 +148,7 @@ module UTF8Encoder {
 
     // step 5
     else if (result === "error") {
-      switch(mode) {
+      switch (mode) {
       case "replacement":
         output.push(0xFFFD);
         break;
@@ -185,7 +186,7 @@ module UTF8Encoder {
 
   export class TextDecoder implements ITextDecoder {
     private _encoding:    DOMString;
-    private decoder:      Decoder;
+    private decoder:      IDecoder;
     private stream:       Stream;
     private ignoreBOMFlag = false;
     private bomSeenFlag   = false;
@@ -269,7 +270,7 @@ module UTF8Encoder {
       var output: Stream = [];
 
       // step 5
-      for(var j=0;;j++) {
+      for (var j=0; ; j++) {
         // step 5-1
         var token: Token = input[j];
 
@@ -289,7 +290,7 @@ module UTF8Encoder {
 
           // step 5-3-3
           else if (result === "error") {
-            throw new TypeError("invalid input")
+            throw new TypeError("invalid input");
           }
 
           // step 5-3-4
@@ -345,22 +346,22 @@ module UTF8Encoder {
   /**
    * UTF-8 Encoder / Decoder Instance
    */
-  interface Coder{
+  interface ICoder {
     handler(input: Stream, token: Token): any;
   }
 
-  interface Encoder extends Coder {
+  interface IEncoder extends ICoder {
   }
 
-  interface Decoder extends Coder {
+  interface IDecoder extends ICoder {
   }
 
   // https://encoding.spec.whatwg.org/#utf-8-encoder
-  class Utf8Encoder implements Encoder {
+  class Utf8Encoder implements IEncoder {
     handler(input: Stream, codePoint: CodePoint): any {
       // step 1
       if (codePoint === EOS) {
-        return 'finished';
+        return "finished";
       }
 
       // step 2
@@ -403,7 +404,7 @@ module UTF8Encoder {
 
 
   // https://encoding.spec.whatwg.org/#utf-8-decoder
-  class Utf8Decoder implements Decoder {
+  class Utf8Decoder implements IDecoder {
     private utf8CodePoint: CodePoint = 0;
     private utf8BytesSeen: number = 0;
     private utf8BytesNeeded: number = 0;
@@ -458,7 +459,7 @@ module UTF8Encoder {
         // TODO: remove this assertion
         if (!(0xC2 <= byt && byt <= 0xF4)) console.assert(false);
 
-        this.utf8CodePoint = this.utf8CodePoint << (6*this.utf8BytesNeeded)
+        this.utf8CodePoint = this.utf8CodePoint << (6*this.utf8BytesNeeded);
         return "continue";
       }
 
@@ -484,7 +485,7 @@ module UTF8Encoder {
 
       // setp 6
       this.utf8BytesSeen += 1;
-      this.utf8CodePoint += (byt - 0x80) << (6 * (this.utf8BytesNeeded - this.utf8BytesSeen))
+      this.utf8CodePoint += (byt - 0x80) << (6 * (this.utf8BytesNeeded - this.utf8BytesSeen));
 
       // step 7
       if (this.utf8BytesSeen !== this.utf8BytesNeeded) {
@@ -495,7 +496,7 @@ module UTF8Encoder {
       var codePoint = this.utf8CodePoint;
 
       // step 9
-      this.utf8CodePoint = 0
+      this.utf8CodePoint = 0;
       this.utf8BytesNeeded = 0;
       this.utf8BytesSeen = 0;
 
