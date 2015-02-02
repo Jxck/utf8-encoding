@@ -47,10 +47,16 @@ use [utf8-encoding.d.ts](./utf8-encoding.d.ts)
 other types which this scripts depends on are in [types](./types) directory.
 
 
-## branch
+## release process
 
-build js in release branch and add tag with semver,
-will publish to npm and bower.
+- develop/maintain on master branch
+- if finished, dump version to new one in package.json
+- checkout release and merge master --no-ff
+- build via npm test
+- commit build
+- add tag
+- push to github
+- npm publish
 
 ## License
 
