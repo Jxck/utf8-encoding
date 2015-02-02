@@ -43,6 +43,6 @@
     "postinstall": "mv node_modules/obtain-unicode/obtain-unicode.d.ts types/",
     "prepublish": "npm run tsc",
     "test": "npm run tsc && node test/test.js && \\rm -f npm-debug.log && echo open test/index.html in your browser",
-    "tsc": "tsc utf8-encoding.ts --target ES5 --module commonjs --noImplicitAny"
+    "tsc": "tsc utf8-encoding.ts --target ES5 --module commonjs"
   }
 }
