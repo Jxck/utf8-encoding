@@ -5,7 +5,7 @@
     "Jxck"
   ],
   "dependencies": {
-    "obtain-unicode": "*"
+    "obtain-unicode": "~0.0.5"
   },
   "homepage": "https://github.com/Jxck/utf8-encoding",
   "ignore": [
