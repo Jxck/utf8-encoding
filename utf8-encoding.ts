@@ -22,9 +22,9 @@ declare var require: any;
 // import only type info
 import ou = require("obtain-unicode");
 
-var ObtainUnicode: typeof ou.ObtainUnicode;
+var obtainUnicode: typeof ou.obtainUnicode;
 if (typeof window === "undefined") { // in node.js
-  ObtainUnicode = require("obtain-unicode").ObtainUnicode;
+  obtainUnicode = require("obtain-unicode").obtainUnicode;
 }
 
 module UTF8Encoder {
@@ -96,7 +96,7 @@ module UTF8Encoder {
     // https://encoding.spec.whatwg.org/#dom-textencoder-encode
     encode(inputString: USVString = ""): Uint8Array {
       // step 1
-      var input: Stream = ObtainUnicode(inputString);
+      var input: Stream = obtainUnicode(inputString);
 
       // step 2
       var output: Stream = [];
