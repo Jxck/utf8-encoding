@@ -4,19 +4,20 @@ var TextDecoder = TextDecoder || require('../utf8-encoding').TextDecoder;
 // tests
 function assert(actual, expected) {
   console.log('.');
+  // console.log(actual, expected);
   console.assert(actual === expected, '\nact: ' + actual + '\nexp: ' + expected);
 }
 
-(function example() {
+function example() {
   var encoder = new TextEncoder();
   var decoder = new TextDecoder();
   console.log(encoder.encode("beer!🍻"));
   // Uint8Array[98, 101, 101, 114, 33, 240, 159, 141, 187]
   console.log(decoder.decode(new Uint8Array([98, 101, 101, 114, 33, 240, 159, 141, 187])));
   // "beer!🍻
-})();
+};
 
-(function test() {
+function test() {
   var encoder = new TextEncoder();
   var decoder = new TextDecoder();
 
@@ -43,4 +44,13 @@ function assert(actual, expected) {
 
     assert(s, decoder.decode(actual));
   });
+};
+
+(function() {
+  try {
+    example();
+    test();
+  } catch(err) {
+    console.error(err);
+  }
 })();
