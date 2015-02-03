@@ -19,7 +19,9 @@ function assert(actual, expected) {
 (function test() {
   var encoder = new TextEncoder();
   var decoder = new TextDecoder();
+
   [
+    [ "",          [ ]],
     [ "aAzZ09",    [ 97, 65, 122, 90, 48, 57 ]],
     [ "~`!@",      [ 126, 96, 33, 64 ]],
     [ "#$%^&",     [ 35, 36, 37, 94, 38 ]],
