@@ -5,10 +5,12 @@
 <script>
   if (window.TextEncoder) {
    console.log('remove browser TextEncoder imple, for force module imple');
+   window.nativeTextEncoder = TextEncoder;
    window.TextEncoder = undefined;
   }
   if (window.TextDecoder) {
    console.log('remove browser TextDecoder imple, for force module imple');
+   window.nativeTextDecoder = TextDecoder;
    window.TextDecoder = undefined;
   }
 </script>
