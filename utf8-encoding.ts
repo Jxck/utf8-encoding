@@ -323,7 +323,7 @@ module UTF8Encoder {
         var token: Token = stream.shift();
 
         // step 2-2
-        if (["utf-8", "utf8"].indexOf(this._encoding) > -1
+        if (["utf-8", "utf8"].indexOf(this._encoding) !== -1
             && this.ignoreBOMFlag === false
             && this.bomSeenFlag === false) {
           // step 2-2-1
