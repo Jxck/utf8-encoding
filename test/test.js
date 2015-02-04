@@ -46,10 +46,40 @@ function test() {
   });
 };
 
+function compat() {
+  var encoder = new TextEncoder();
+  var _encoder = new nativeTextEncoder();
+
+  assert(JSON.stringify(encoder.encode()),          JSON.stringify(_encoder.encode()));
+  assert(JSON.stringify(encoder.encode('')),        JSON.stringify(_encoder.encode('')));
+  assert(JSON.stringify(encoder.encode(null)),      JSON.stringify(_encoder.encode(null)));
+  assert(JSON.stringify(encoder.encode(undefined)), JSON.stringify(_encoder.encode(undefined)));
+
+
+  var decoder = new TextDecoder();
+  var _decoder = new nativeTextDecoder();
+
+  assert(decoder.decode(),          _decoder.decode());
+  // unspecified in spec ?
+  // assert(decoder.decode([]),        _decoder.decode([]));
+  // assert(decoder.decode(null),      _decoder.decode(null));
+  assert(decoder.decode(undefined), _decoder.decode(undefined));
+
+  assert(decoder.decode(encoder.encode()),          _decoder.decode(_encoder.encode()));
+  assert(decoder.decode(encoder.encode('')),        _decoder.decode(_encoder.encode('')));
+  assert(decoder.decode(encoder.encode(null)),      _decoder.decode(_encoder.encode(null)));
+  assert(decoder.decode(encoder.encode(undefined)), _decoder.decode(_encoder.encode(undefined)));
+};
+
 (function() {
   try {
     example();
     test();
+
+    if (typeof nativeTextEncoder !== 'undefined'
+     && typeof nativeTextDecoder !== 'undefined') {
+      compat();
+    }
   } catch(err) {
     console.error(err);
   }
