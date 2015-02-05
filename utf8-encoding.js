@@ -4,6 +4,15 @@ var obtainUnicode;
 if (typeof window === "undefined") {
     obtainUnicode = require("obtain-unicode").obtainUnicode;
 }
+// save platform implementation if exists
+var nativeTextEncoder;
+if (typeof this.TextEncoder !== "undefined") {
+    nativeTextEncoder = this.TextEncoder;
+}
+var nativeTextDecoder;
+if (typeof this.TextDecoder !== "undefined") {
+    nativeTextDecoder = this.TextDecoder;
+}
 var UTF8Encoder;
 (function (UTF8Encoder) {
     "use strict";
@@ -228,7 +237,7 @@ var UTF8Encoder;
                 // step 2-1
                 var token = stream.shift();
                 // step 2-2
-                if (["utf-8", "utf8"].indexOf(this._encoding) > -1 && this.ignoreBOMFlag === false && this.bomSeenFlag === false) {
+                if (["utf-8", "utf8"].indexOf(this._encoding) !== -1 && this.ignoreBOMFlag === false && this.bomSeenFlag === false) {
                     // step 2-2-1
                     if (token === 0xFEFF) {
                         this.bomSeenFlag = true;
@@ -385,5 +394,5 @@ var UTF8Encoder;
         return Utf8Decoder;
     })();
 })(UTF8Encoder || (UTF8Encoder = {}));
-this.TextEncoder = this.TextEncoder || UTF8Encoder.TextEncoder;
-this.TextDecoder = this.TextDecoder || UTF8Encoder.TextDecoder;
+this.TextEncoder = nativeTextEncoder || UTF8Encoder.TextEncoder;
+this.TextDecoder = nativeTextDecoder || UTF8Encoder.TextDecoder;
