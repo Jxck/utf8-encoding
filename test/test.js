@@ -4,22 +4,25 @@ var TextDecoder = TextDecoder || require('../utf8-encoding').TextDecoder;
 // tests
 function assert(actual, expected) {
   console.log('.');
+  // console.log(actual, expected);
   console.assert(actual === expected, '\nact: ' + actual + '\nexp: ' + expected);
 }
 
-(function example() {
+function example() {
   var encoder = new TextEncoder();
   var decoder = new TextDecoder();
   console.log(encoder.encode("beer!🍻"));
   // Uint8Array[98, 101, 101, 114, 33, 240, 159, 141, 187]
   console.log(decoder.decode(new Uint8Array([98, 101, 101, 114, 33, 240, 159, 141, 187])));
   // "beer!🍻
-})();
+};
 
-(function test() {
-  var encoder = new TextEncoder();
-  var decoder = new TextDecoder();
+function test(textencoder, textdecoder) {
+  var encoder = new textencoder();
+  var decoder = new textdecoder();
+
   [
+    [ "",          [ ]],
     [ "aAzZ09",    [ 97, 65, 122, 90, 48, 57 ]],
     [ "~`!@",      [ 126, 96, 33, 64 ]],
     [ "#$%^&",     [ 35, 36, 37, 94, 38 ]],
@@ -41,4 +44,26 @@ function assert(actual, expected) {
 
     assert(s, decoder.decode(actual));
   });
+};
+
+function compat() {
+  // unspecified in spec ?
+  // assert(decoder.decode([]),        _decoder.decode([]));
+  // assert(decoder.decode(null),      _decoder.decode(null));
+  // assert(decoder.decode(undefined),      _decoder.decode(undefined));
+};
+
+(function TestEncoding() {
+  try {
+    example();
+    test(TextEncoder, TextDecoder);
+
+    if (typeof nativeTextEncoder !== 'undefined'
+     && typeof nativeTextDecoder !== 'undefined') {
+      test(nativeTextEncoder, nativeTextDecoder);
+      compat();
+    }
+  } catch(err) {
+    console.error(err);
+  }
 })();

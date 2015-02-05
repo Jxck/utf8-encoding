@@ -27,6 +27,17 @@ if (typeof window === "undefined") { // in node.js
   obtainUnicode = require("obtain-unicode").obtainUnicode;
 }
 
+// save platform implementation if exists
+var nativeTextEncoder;
+if (typeof this.TextEncoder !== "undefined") {
+  nativeTextEncoder = this.TextEncoder;
+}
+
+var nativeTextDecoder;
+if (typeof this.TextDecoder !== "undefined") {
+  nativeTextDecoder = this.TextDecoder;
+}
+
 module UTF8Encoder {
   "use strict";
 
@@ -312,7 +323,7 @@ module UTF8Encoder {
         var token: Token = stream.shift();
 
         // step 2-2
-        if (["utf-8", "utf8"].indexOf(this._encoding) > -1
+        if (["utf-8", "utf8"].indexOf(this._encoding) !== -1
             && this.ignoreBOMFlag === false
             && this.bomSeenFlag === false) {
           // step 2-2-1
@@ -505,5 +516,5 @@ module UTF8Encoder {
   }
 }
 
-this.TextEncoder = this.TextEncoder || UTF8Encoder.TextEncoder;
-this.TextDecoder = this.TextDecoder || UTF8Encoder.TextDecoder;
+this.TextEncoder = nativeTextEncoder || UTF8Encoder.TextEncoder;
+this.TextDecoder = nativeTextDecoder || UTF8Encoder.TextDecoder;

@@ -1,7 +1,7 @@
 {
   "name": "utf8-encoding",
   "description": "utf8 encoder/decoder of whatwg Encoding Living Standard https://encoding.spec.whatwg.org/",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "author": "Jxck",
   "bugs": {
     "url": "https://github.com/Jxck/utf8-encoding/issues"
@@ -39,10 +39,10 @@
   },
   "scripts": {
     "bower": "bower install",
-    "clean": "\\rm -f *.js",
-    "postinstall": "mv node_modules/obtain-unicode/obtain-unicode.d.ts types/",
+    "clean": "\\rm -f *.js npm-debug.log",
+    "type": "cp node_modules/obtain-unicode/obtain-unicode.d.ts types/",
     "prepublish": "npm run tsc",
     "test": "npm run tsc && node test/test.js && \\rm -f npm-debug.log && echo open test/index.html in your browser",
-    "tsc": "tsc utf8-encoding.ts --target ES5 --module commonjs --noImplicitAny"
+    "tsc": "tsc utf8-encoding.ts --target ES5 --module commonjs"
   }
 }
