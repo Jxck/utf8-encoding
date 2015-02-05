@@ -21,6 +21,7 @@
     "package.json",
     "utf8-encoding.d.ts",
     "utf8-encoding.js",
+    "utf8-encoding.js.map",
     "utf8-encoding.ts"
   ],
   "homepage": "https://github.com/Jxck/utf8-encoding",
