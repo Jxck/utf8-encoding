@@ -396,3 +396,4 @@ var UTF8Encoder;
 })(UTF8Encoder || (UTF8Encoder = {}));
 this.TextEncoder = nativeTextEncoder || UTF8Encoder.TextEncoder;
 this.TextDecoder = nativeTextDecoder || UTF8Encoder.TextDecoder;
+//# sourceMappingURL=utf8-encoding.js.map
