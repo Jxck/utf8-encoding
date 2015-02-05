@@ -40,7 +40,7 @@
   },
   "scripts": {
     "bower": "bower install",
-    "clean": "\\rm -f *.js npm-debug.log",
+    "clean": "\\rm -f *.js *.map npm-debug.log",
     "type": "cp node_modules/obtain-unicode/obtain-unicode.d.ts types/",
     "prepublish": "npm run tsc",
     "test": "npm run tsc && node test/test.js && \\rm -f npm-debug.log && echo open test/index.html in your browser",
