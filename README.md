@@ -30,7 +30,20 @@ console.log(decoder.decode(new Uint8Array([98, 101, 101, 114, 33, 240, 159, 141,
 // "beer!🍻
 ```
 
-## build and test
+## build
+
+```sh
+$ npm install
+$ npm run tsc
+```
+
+will build `utf8-encoding.js`.
+
+or you can get build result from [release branch](https://github.com/Jxck/utf8-encoding/tree/release)
+which is same as npm intsall.
+
+
+## test
 
 ```sh
 $ npm install
